@@ -2,7 +2,7 @@
 
 Dingjie Song, Zhiling Yan, Ziqian Zhang, Yuxuan Zhang, Lichao Sun
 
-[Paper](https://arxiv.org/abs/XXXX.XXXXX) | [Project page](https://openlair.github.io/premisecheck/) | [ReviewFact dataset](https://huggingface.co/datasets/OpenLAIR/ReviewFact)
+[Paper](https://arxiv.org/abs/XXXX.XXXXX) | [Project page](https://openlair.github.io/premisecheck/) | [ReviewFact dataset](https://huggingface.co/datasets/songdj/ReviewFact)
 
 **TL;DR.** PremiseCheck scores how likely a peer-review comment contains a factual error about the paper it reviews.
 An LLM rewrites the comment as explicit premises without reading the paper. A small decision model then checks each
@@ -108,7 +108,7 @@ pass `--data <directory> --source <name> --field nlp`.
 Download the NLP and natural-science parts from Hugging Face (`pip install -U huggingface_hub` provides `hf`):
 
 ```bash
-hf download OpenLAIR/ReviewFact --repo-type dataset --local-dir data/ReviewFact
+hf download songdj/ReviewFact --repo-type dataset --local-dir data/ReviewFact
 ```
 
 The machine-learning part comes from ReviewScore, which states no license, so it is not redistributed. Rebuild it
@@ -129,7 +129,7 @@ Face, and `rs.jsonl` and `papers_rs.jsonl` from the script.
 | Machine learning (`rs`) | ReviewScore | 39 | 216 | 46 |
 | Natural sciences (`prb`) | PeerReview Bench | 78 | 2,585 | 65 |
 
-See the [dataset card](https://huggingface.co/datasets/OpenLAIR/ReviewFact) for the label rules. ReviewFact is for
+See the [dataset card](https://huggingface.co/datasets/songdj/ReviewFact) for the label rules. ReviewFact is for
 evaluation only: do not use it to train models.
 
 ## Results

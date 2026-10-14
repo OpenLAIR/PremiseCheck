@@ -1,6 +1,6 @@
 """Reading ReviewFact, in either layout:
   flat:          <source>.jsonl and papers_<source>.jsonl            (e.g. rc.jsonl; scripts/build_reviewscore.py)
-  Hugging Face:  data/<field>/test.jsonl and data/<field>/papers.jsonl (huggingface.co/datasets/OpenLAIR/ReviewFact)
+  Hugging Face:  data/<field>/test.jsonl and data/<field>/papers.jsonl (huggingface.co/datasets/songdj/ReviewFact)
 """
 import json
 from pathlib import Path

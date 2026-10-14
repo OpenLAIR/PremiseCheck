@@ -33,7 +33,7 @@ premisecheck = "premisecheck.cli:main"
 [project.urls]
 Homepage = "https://openlair.github.io/premisecheck/"
 Repository = "https://github.com/OpenLAIR/PremiseCheck"
-Dataset = "https://huggingface.co/datasets/OpenLAIR/ReviewFact"
+Dataset = "https://huggingface.co/datasets/songdj/ReviewFact"
 
 [tool.setuptools]
 packages = ["premisecheck"]
