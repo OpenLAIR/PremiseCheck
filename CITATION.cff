@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software or ReviewFact, please cite the paper below."
+title: "PremiseCheck"
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/OpenLAIR/PremiseCheck"
+url: "https://openlair.github.io/premisecheck/"
+authors:
+  - family-names: Song
+    given-names: Dingjie
+  - family-names: Yan
+    given-names: Zhiling
+  - family-names: Zhang
+    given-names: Ziqian
+  - family-names: Zhang
+    given-names: Yuxuan
+  - family-names: Sun
+    given-names: Lichao
+preferred-citation:
+  type: article
+  title: "PremiseCheck: Efficient Fact-Checking of Human and AI Peer Reviews"
+  authors:
+    - family-names: Song
+      given-names: Dingjie
+    - family-names: Yan
+      given-names: Zhiling
+    - family-names: Zhang
+      given-names: Ziqian
+    - family-names: Zhang
+      given-names: Yuxuan
+    - family-names: Sun
+      given-names: Lichao
+  journal: "arXiv preprint arXiv:XXXX.XXXXX"
+  year: 2026
+  url: "https://arxiv.org/abs/XXXX.XXXXX"

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "premisecheck"
+version = "0.1.0"
+description = "PremiseCheck: efficient fact-checking of human and AI peer reviews"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Dingjie Song" },
+  { name = "Zhiling Yan" },
+  { name = "Ziqian Zhang" },
+  { name = "Yuxuan Zhang" },
+  { name = "Lichao Sun" },
+]
+dependencies = ["numpy", "tiktoken>=0.7", "openai>=1.40", "requests"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+premisecheck = "premisecheck.cli:main"
+
+[project.urls]
+Homepage = "https://openlair.github.io/premisecheck/"
+Repository = "https://github.com/OpenLAIR/PremiseCheck"
+Dataset = "https://huggingface.co/datasets/OpenLAIR/ReviewFact"
+
+[tool.setuptools]
+packages = ["premisecheck"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

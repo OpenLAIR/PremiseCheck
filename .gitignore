@@ -1,0 +1,11 @@
+# downloaded or rebuilt ReviewFact (not redistributed here), runs and request caches
+data/
+runs/
+.cache/
+# Python
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv*/
+build/
+dist/
