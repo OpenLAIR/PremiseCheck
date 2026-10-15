@@ -16,12 +16,10 @@
   <a href="https://huggingface.co/datasets/songdj/ReviewFact"><img src="https://img.shields.io/badge/Dataset-ReviewFact-ffd21e?logo=huggingface&logoColor=black" alt="ReviewFact on Hugging Face"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-a5702d" alt="MIT License"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10+"></a>
-  <a href="https://github.com/OpenLAIR/PremiseCheck/actions/workflows/tests.yml"><img src="https://github.com/OpenLAIR/PremiseCheck/actions/workflows/tests.yml/badge.svg?branch=main" alt="Tests"></a>
 </p>
 
 <p align="center">
   <a href="#overview">Overview</a> &middot;
-  <a href="#results">Results</a> &middot;
   <a href="#install">Install</a> &middot;
   <a href="#quickstart-python">Quickstart</a> &middot;
   <a href="#command-line">CLI</a> &middot;
@@ -35,9 +33,9 @@
 **TL;DR.** PremiseCheck scores how likely a peer-review comment contains a factual error about the paper it reviews.
 An LLM rewrites the comment as explicit premises without reading the paper. A small decision model then checks each
 premise against the paper, and the comment is scored by its weakest premise. Only the decision model reads the paper,
-so the expensive LLM never processes the long paper text. On ReviewFact, a benchmark of expert-labeled comments from
-NLP, machine learning and the natural sciences, PremiseCheck reaches AUROC comparable to a holistic GPT-5.5 judge at
-about a fifth to a half of its cost.
+so the expensive LLM never processes the long paper text. As a result, PremiseCheck detects errors comparably to a
+frontier LLM that reads the whole paper, at a fraction of its cost. See the paper for the results on ReviewFact, a benchmark of
+expert-labeled comments from NLP, machine learning and the natural sciences.
 
 ## Overview
 
@@ -69,69 +67,7 @@ checked, and the decision model is asked whether the paper contradicts the premi
 | **Kev-27B** (`jaredpalmer/kev-27b@v1.0`) | open weights, served on your own GPU; see [docs/kev.md](docs/kev.md) | the default |
 | **Jev** | OpenRouter's decisions endpoint (`/api/alpha/decisions`) | requires access to that alpha endpoint |
 
-Table 1 of the paper uses Jev. With Kev-27B, PremiseCheck reaches similar AUROC on the NLP part. The decomposer and
-the holistic baseline use any OpenAI-compatible chat endpoint.
-
-## Results
-
-AUROC (x100) on ReviewFact with each comment checked on its own, and cost as a percentage of holistic GPT-5.5
-(reasoning medium). PremiseCheck uses GPT-5.5 as the decomposer at the given reasoning effort and Jev as the decision
-model (Table 1 of the paper).
-
-<table>
-  <thead>
-    <tr>
-      <th rowspan="2" align="left">System</th>
-      <th rowspan="2" align="left">Reasoning</th>
-      <th colspan="2">NLP</th>
-      <th colspan="2">Machine learning</th>
-      <th colspan="2">Natural sciences</th>
-    </tr>
-    <tr>
-      <th>AUROC</th><th>Cost (%)</th>
-      <th>AUROC</th><th>Cost (%)</th>
-      <th>AUROC</th><th>Cost (%)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Holistic GPT-5.5 (ref.)</td><td>medium</td>
-      <td align="center">63.2</td><td align="center">100.0</td>
-      <td align="center">66.9</td><td align="center">100.0</td>
-      <td align="center">67.8</td><td align="center">100.0</td>
-    </tr>
-    <tr>
-      <td><b>PremiseCheck</b></td><td>medium</td>
-      <td align="center">63.0</td><td align="center">51.2</td>
-      <td align="center">68.7</td><td align="center">46.6</td>
-      <td align="center">67.5</td><td align="center">47.4</td>
-    </tr>
-    <tr>
-      <td><b>PremiseCheck</b></td><td>low</td>
-      <td align="center">64.1</td><td align="center">34.3</td>
-      <td align="center">63.9</td><td align="center">29.2</td>
-      <td align="center">65.7</td><td align="center">26.2</td>
-    </tr>
-    <tr>
-      <td><b>PremiseCheck</b></td><td>none</td>
-      <td align="center">63.1</td><td align="center">24.6</td>
-      <td align="center">63.7</td><td align="center">19.5</td>
-      <td align="center">66.0</td><td align="center">22.3</td>
-    </tr>
-  </tbody>
-</table>
-
-PremiseCheck is comparable to holistic GPT-5.5 at a fraction of its cost. On the NLP part all three settings are
-non-inferior to the reference (the 95% interval of the paired AUROC difference lies above -3). With 16 phrasings of
-the verification question, the NLP AUROC of PremiseCheck (reasoning none) rises from 63.1 to 65.7. The
-machine-learning and natural-science parts have only 46 and 65 errors, so their confidence intervals are wide.
-
-<p align="center">
-  <img src="assets/frontier.png" alt="Cost and AUROC on the NLP reviews" width="560">
-</p>
-<p align="center"><sub>Cost and AUROC on the NLP reviews, (a) per comment and (b) batched per review, where PremiseCheck uses
-16 phrasings. Labels give the reasoning of the LLM, and the line and band mark the per-comment reference and &plusmn;3.
-The batched and fused systems of panel (b) are described in the paper and are not part of this package.</sub></p>
+Table 1 of the paper uses Jev. The decomposer and the holistic baseline use any OpenAI-compatible chat endpoint.
 
 ## Install
 
@@ -245,20 +181,34 @@ See the [dataset card](https://huggingface.co/datasets/songdj/ReviewFact) for th
 
 ## Reproducing the paper
 
-Replaying the original API calls of the paper through this package on the released ReviewFact files gives:
+Each PremiseCheck setting of the paper is one `premisecheck run` on one part of ReviewFact, scored with
+`premisecheck eval` against the holistic GPT-5.5 run as `--ref`. The runs with Jev give the PremiseCheck rows of
+Table 1, and `premisecheck holistic` gives the holistic GPT-5.5 reference. All settings use GPT-5.5 as the decomposer and
+truncate each paper to its first 24k o200k_base tokens.
 
-- **NLP and machine learning.** AUROC, cost share and bootstrap intervals of Table 1 reproduce exactly (e.g. NLP
-  63.0 / 64.1 / 63.1 for medium / low / none, 65.7 with 16 phrasings on none, holistic GPT-5.5 63.2; ML
-  68.7 / 63.9 / 63.7 against 66.9). One accounting difference: the package also counts the cost of the
-  whole-comment fallback (comments without premises), so NLP medium is 51.3% of the reference instead of 51.2%.
-- **Natural sciences.** The premise path reproduces exactly. For the about 1% of comments with no premise to verify
-  (17-22 of 2,585), the paper gave the decision model the PeerReview Bench judgment input, while this package asks
-  the generic whole-comment question, so those few scores can differ (AUROC 66.2 with reasoning none on the comments
-  covered, against 66.0 in the paper). The holistic GPT-5.5 baseline of this part used the PeerReview Bench judgment
-  prompt and is not included.
+| setting | options |
+|---|---|
+| PremiseCheck, reasoning medium, low or none | `premisecheck run --decision jev --decomposer gpt-5.5 --effort medium\|low\|none` |
+| PremiseCheck with 16 phrasings | the same, with `--phrasings 16` |
+| PremiseCheck with Kev-27B | the same, with `--decision kev` |
+| Holistic GPT-5.5 (reference) | `premisecheck holistic --model gpt-5.5 --effort medium` |
 
-> [!NOTE]
-> Fresh API runs are not bit-identical because the models sample, so expect small differences.
+Run each setting with `--source rc`, `rs` and `prb` for the NLP, machine-learning and natural-science parts.
+`premisecheck eval` prints AUROC, cost, latency and the paired paper-bootstrap difference to the reference. See the
+paper for the numbers.
+
+We checked the package by replaying the original API responses of the paper on the released ReviewFact files. The
+NLP and machine-learning results and the premise path of the natural-science part reproduce exactly. Differences
+to keep in mind:
+
+- **Sampling.** Fresh API runs are not bit-identical because the models sample, so expect small differences.
+- **Cost of the fallback.** The package also counts the cost of the whole-comment fallback for comments without
+  premises, which the paper left out, so its cost shares can be slightly higher.
+- **Natural-science comments without premises.** For about 1% of natural-science comments there is no premise to
+  verify. The paper gave the decision model the PeerReview Bench judgment input for these comments, while the package
+  asks the generic whole-comment question, so their scores can differ.
+- **Natural-science holistic baseline.** The holistic GPT-5.5 reference of the natural-science part used the
+  PeerReview Bench judgment prompt and is not included in the package.
 
 ## Repository layout
 

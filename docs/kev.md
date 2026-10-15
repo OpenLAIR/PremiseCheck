@@ -1,8 +1,7 @@
 # Serving Kev-27B
 
 Kev-27B is an open-weight decision model. PremiseCheck uses it as a drop-in replacement for Jev: both read a state
-(named texts such as `paper` and `proposition`) and answer yes/no questions about it with probabilities. On the NLP
-part of ReviewFact, PremiseCheck with Kev-27B reaches AUROC similar to PremiseCheck with Jev.
+(named texts such as `paper` and `proposition`) and answer yes/no questions about it with probabilities.
 
 - Model: https://huggingface.co/jaredpalmer/kev-27b (the paper uses the `v1.0` tag)
 - Server code: https://github.com/jaredpalmer/kev (the paper uses the `kev-1.0` tag), which serves a
