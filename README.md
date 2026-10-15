@@ -1,8 +1,36 @@
-# PremiseCheck: Efficient Fact-Checking of Human and AI Peer Reviews
+<p align="center">
+  <img src="assets/banner.png" alt="PremiseCheck: Efficient Fact-Checking of Human and AI Peer Reviews" width="100%">
+</p>
 
-Dingjie Song, Zhiling Yan, Ziqian Zhang, Yuxuan Zhang, Lichao Sun
+<p align="center">
+  Dingjie Song<sup>1</sup>, Zhiling Yan<sup>1</sup>, Ziqian Zhang<sup>1</sup>, Yuxuan Zhang<sup>2,3</sup>, Lichao Sun<sup>1&dagger;</sup>
+  <br>
+  <sup>1</sup>Lehigh University &nbsp;&nbsp; <sup>2</sup>University of British Columbia &nbsp;&nbsp; <sup>3</sup>Vector Institute
+  <br>
+  <sup>&dagger;</sup>Corresponding author
+</p>
 
-[Paper](https://arxiv.org/abs/XXXX.XXXXX) | [Project page](https://openlair.github.io/premisecheck/) | [ReviewFact dataset](https://huggingface.co/datasets/songdj/ReviewFact)
+<p align="center">
+  <a href="https://arxiv.org/abs/XXXX.XXXXX"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b?logo=arxiv&logoColor=white" alt="arXiv paper"></a>
+  <a href="https://openlair.github.io/premisecheck/"><img src="https://img.shields.io/badge/Project-Page-2b6cb0?logo=googlechrome&logoColor=white" alt="Project page"></a>
+  <a href="https://huggingface.co/datasets/songdj/ReviewFact"><img src="https://img.shields.io/badge/Dataset-ReviewFact-ffd21e?logo=huggingface&logoColor=black" alt="ReviewFact on Hugging Face"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-a5702d" alt="MIT License"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://github.com/OpenLAIR/PremiseCheck/actions/workflows/tests.yml"><img src="https://github.com/OpenLAIR/PremiseCheck/actions/workflows/tests.yml/badge.svg?branch=main" alt="Tests"></a>
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> &middot;
+  <a href="#results">Results</a> &middot;
+  <a href="#install">Install</a> &middot;
+  <a href="#quickstart-python">Quickstart</a> &middot;
+  <a href="#command-line">CLI</a> &middot;
+  <a href="#reviewfact">ReviewFact</a> &middot;
+  <a href="#reproducing-the-paper">Reproduction</a> &middot;
+  <a href="#citation">Citation</a>
+</p>
+
+**News.** 2026-10: the code and the ReviewFact benchmark are released.
 
 **TL;DR.** PremiseCheck scores how likely a peer-review comment contains a factual error about the paper it reviews.
 An LLM rewrites the comment as explicit premises without reading the paper. A small decision model then checks each
@@ -11,7 +39,15 @@ so the expensive LLM never processes the long paper text. On ReviewFact, a bench
 NLP, machine learning and the natural sciences, PremiseCheck reaches AUROC comparable to a holistic GPT-5.5 judge at
 about a fifth to a half of its cost.
 
-## How it works
+## Overview
+
+<p align="center">
+  <img src="assets/pipeline.png" alt="The PremiseCheck pipeline: decompose, route, verify, aggregate" width="100%">
+</p>
+<p align="center"><sub>PremiseCheck on a ReviewFact sample that experts labeled as a factual error, with premises shortened for
+display. Only the verifier reads the paper, and the lowest premise score, shown in red, is the comment score.</sub></p>
+
+### How it works
 
 1. **Decompose.** An LLM (GPT-5.5 in the paper) reads only the comment and lists the premises it relies on.
 2. **Route.** For NLP and machine learning reviews, the decision model decides whether each premise can be checked
@@ -26,14 +62,76 @@ natural-science reviews the decomposer types each premise (paper, knowledge, opi
 checked, and the decision model is asked whether the paper contradicts the premise (score = 1 - p). Optionally,
 16 phrasings of the verification question are asked in one call and averaged (the last eight are inverted).
 
-Two decision models are supported:
+### Decision models
 
-- **Kev-27B** (`jaredpalmer/kev-27b@v1.0`), open weights, served on your own GPU. This is the default; see
-  [docs/kev.md](docs/kev.md) for how to serve it.
-- **Jev**, via OpenRouter's decisions endpoint (`/api/alpha/decisions`), which requires access to that alpha
-  endpoint. Table 1 of the paper uses Jev. With Kev-27B, PremiseCheck reaches similar AUROC on the NLP part.
+| decision model | how to run it | notes |
+|---|---|---|
+| **Kev-27B** (`jaredpalmer/kev-27b@v1.0`) | open weights, served on your own GPU; see [docs/kev.md](docs/kev.md) | the default |
+| **Jev** | OpenRouter's decisions endpoint (`/api/alpha/decisions`) | requires access to that alpha endpoint |
 
-The decomposer and the holistic baseline use any OpenAI-compatible chat endpoint.
+Table 1 of the paper uses Jev. With Kev-27B, PremiseCheck reaches similar AUROC on the NLP part. The decomposer and
+the holistic baseline use any OpenAI-compatible chat endpoint.
+
+## Results
+
+AUROC (x100) on ReviewFact with each comment checked on its own, and cost as a percentage of holistic GPT-5.5
+(reasoning medium). PremiseCheck uses GPT-5.5 as the decomposer at the given reasoning effort and Jev as the decision
+model (Table 1 of the paper).
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" align="left">System</th>
+      <th rowspan="2" align="left">Reasoning</th>
+      <th colspan="2">NLP</th>
+      <th colspan="2">Machine learning</th>
+      <th colspan="2">Natural sciences</th>
+    </tr>
+    <tr>
+      <th>AUROC</th><th>Cost (%)</th>
+      <th>AUROC</th><th>Cost (%)</th>
+      <th>AUROC</th><th>Cost (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Holistic GPT-5.5 (ref.)</td><td>medium</td>
+      <td align="center">63.2</td><td align="center">100.0</td>
+      <td align="center">66.9</td><td align="center">100.0</td>
+      <td align="center">67.8</td><td align="center">100.0</td>
+    </tr>
+    <tr>
+      <td><b>PremiseCheck</b></td><td>medium</td>
+      <td align="center">63.0</td><td align="center">51.2</td>
+      <td align="center">68.7</td><td align="center">46.6</td>
+      <td align="center">67.5</td><td align="center">47.4</td>
+    </tr>
+    <tr>
+      <td><b>PremiseCheck</b></td><td>low</td>
+      <td align="center">64.1</td><td align="center">34.3</td>
+      <td align="center">63.9</td><td align="center">29.2</td>
+      <td align="center">65.7</td><td align="center">26.2</td>
+    </tr>
+    <tr>
+      <td><b>PremiseCheck</b></td><td>none</td>
+      <td align="center">63.1</td><td align="center">24.6</td>
+      <td align="center">63.7</td><td align="center">19.5</td>
+      <td align="center">66.0</td><td align="center">22.3</td>
+    </tr>
+  </tbody>
+</table>
+
+PremiseCheck is comparable to holistic GPT-5.5 at a fraction of its cost. On the NLP part all three settings are
+non-inferior to the reference (the 95% interval of the paired AUROC difference lies above -3). With 16 phrasings of
+the verification question, the NLP AUROC of PremiseCheck (reasoning none) rises from 63.1 to 65.7. The
+machine-learning and natural-science parts have only 46 and 65 errors, so their confidence intervals are wide.
+
+<p align="center">
+  <img src="assets/frontier.png" alt="Cost and AUROC on the NLP reviews" width="560">
+</p>
+<p align="center"><sub>Cost and AUROC on the NLP reviews, (a) per comment and (b) batched per review, where PremiseCheck uses
+16 phrasings. Labels give the reasoning of the LLM, and the line and band mark the per-comment reference and &plusmn;3.
+The batched and fused systems of panel (b) are described in the paper and are not part of this package.</sub></p>
 
 ## Install
 
@@ -103,7 +201,18 @@ To score your own comments, write `<name>.jsonl` (one `{"id", "paper_id", "comme
 or `correct`, is needed only for `eval`) and `papers_<name>.jsonl` (`{"paper_id", "text"}`) into a directory and
 pass `--data <directory> --source <name> --field nlp`.
 
+## Serving Kev-27B
+
+Kev-27B is the default decision model and runs on one 80 GB GPU. [docs/kev.md](docs/kev.md) explains how to start a
+server from the open weights and point PremiseCheck at it with `KEV_BASE_URL`.
+
 ## ReviewFact
+
+<p align="center">
+  <img src="assets/bench_overview.png" alt="The ReviewFact task and how its labels are built from expert annotations" width="100%">
+</p>
+<p align="center"><sub>(a) The task on a real ReviewFact comment that claims a baseline is missing although the paper reports it.
+(b) ReviewFact labels from the expert annotations of three datasets.</sub></p>
 
 Download the NLP and natural-science parts from Hugging Face (`pip install -U huggingface_hub` provides `hf`):
 
@@ -124,31 +233,15 @@ python scripts/build_reviewscore.py --reviewscore ReivewScore --out data/ReviewF
 Face, and `rs.jsonl` and `papers_rs.jsonl` from the script.
 
 | part | source | papers | comments | errors |
-|---|---|---|---|---|
+|---|---|---:|---:|---:|
 | NLP (`rc`) | ReviewCritique | 100 | 6,466 | 308 |
 | Machine learning (`rs`) | ReviewScore | 39 | 216 | 46 |
 | Natural sciences (`prb`) | PeerReview Bench | 78 | 2,585 | 65 |
 
-See the [dataset card](https://huggingface.co/datasets/songdj/ReviewFact) for the label rules. ReviewFact is for
-evaluation only: do not use it to train models.
+See the [dataset card](https://huggingface.co/datasets/songdj/ReviewFact) for the label rules.
 
-## Results
-
-AUROC (x100) on ReviewFact with each comment checked on its own, and cost as a percentage of holistic GPT-5.5
-(reasoning medium). PremiseCheck uses GPT-5.5 as the decomposer at the given reasoning effort and Jev as the decision
-model (Table 1 of the paper).
-
-| system | reasoning | NLP AUROC | NLP cost | ML AUROC | ML cost | Science AUROC | Science cost |
-|---|---|---|---|---|---|---|---|
-| Holistic GPT-5.5 (ref.) | medium | 63.2 | 100.0 | 66.9 | 100.0 | 67.8 | 100.0 |
-| PremiseCheck | medium | 63.0 | 51.2 | 68.7 | 46.6 | 67.5 | 47.4 |
-| PremiseCheck | low | 64.1 | 34.3 | 63.9 | 29.2 | 65.7 | 26.2 |
-| PremiseCheck | none | 63.1 | 24.6 | 63.7 | 19.5 | 66.0 | 22.3 |
-
-PremiseCheck is comparable to holistic GPT-5.5 at a fraction of its cost. On the NLP part all three settings are
-non-inferior to the reference (the 95% interval of the paired AUROC difference lies above -3). With 16 phrasings of
-the verification question, the NLP AUROC of PremiseCheck (reasoning none) rises from 63.1 to 65.7. The
-machine-learning and natural-science parts have only 46 and 65 errors, so their confidence intervals are wide.
+> [!IMPORTANT]
+> ReviewFact is for evaluation only: do not use it to train models.
 
 ## Reproducing the paper
 
@@ -164,7 +257,8 @@ Replaying the original API calls of the paper through this package on the releas
   covered, against 66.0 in the paper). The holistic GPT-5.5 baseline of this part used the PeerReview Bench judgment
   prompt and is not included.
 
-Fresh API runs are not bit-identical because the models sample, so expect small differences.
+> [!NOTE]
+> Fresh API runs are not bit-identical because the models sample, so expect small differences.
 
 ## Repository layout
 
@@ -178,6 +272,7 @@ Fresh API runs are not bit-identical because the models sample, so expect small 
 | `premisecheck/cli.py` | the `premisecheck` command |
 | `scripts/build_reviewscore.py` | rebuilds the machine-learning part of ReviewFact |
 | `docs/kev.md` | serving Kev-27B |
+| `assets/` | figures of this README |
 
 ## Tests
 
