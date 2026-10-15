@@ -17,7 +17,7 @@ authors:
   - family-names: Sun
     given-names: Lichao
 preferred-citation:
-  type: article
+  type: generic
   title: "PremiseCheck: Efficient Fact-Checking of Human and AI Peer Reviews"
   authors:
     - family-names: Song
@@ -30,6 +30,6 @@ preferred-citation:
       given-names: Yuxuan
     - family-names: Sun
       given-names: Lichao
-  journal: "arXiv preprint arXiv:XXXX.XXXXX"
   year: 2026
-  url: "https://arxiv.org/abs/XXXX.XXXXX"
+  notes: "Preprint"
+  url: "https://www.alphaxiv.org/abs/2610.premisecheck-peer-review-fact-checking"

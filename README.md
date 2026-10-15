@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/XXXX.XXXXX"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b?logo=arxiv&logoColor=white" alt="arXiv paper"></a>
+  <a href="https://www.alphaxiv.org/abs/2610.premisecheck-peer-review-fact-checking"><img src="https://img.shields.io/badge/Paper-alphaXiv-b31b1b" alt="Paper on alphaXiv"></a>
   <a href="https://openlair.github.io/premisecheck/"><img src="https://img.shields.io/badge/Project-Page-2b6cb0?logo=googlechrome&logoColor=white" alt="Project page"></a>
   <a href="https://huggingface.co/datasets/songdj/ReviewFact"><img src="https://img.shields.io/badge/Dataset-ReviewFact-ffd21e?logo=huggingface&logoColor=black" alt="ReviewFact on Hugging Face"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-a5702d" alt="MIT License"></a>
@@ -289,11 +289,12 @@ Questions and bug reports are welcome as [GitHub issues](https://github.com/Open
 ## Citation
 
 ```bibtex
-@article{song2026premisecheck,
-  title   = {{PremiseCheck}: Efficient Fact-Checking of Human and {AI} Peer Reviews},
-  author  = {Song, Dingjie and Yan, Zhiling and Zhang, Ziqian and Zhang, Yuxuan and Sun, Lichao},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},
-  year    = {2026}
+@misc{song2026premisecheck,
+  title  = {{PremiseCheck}: Efficient Fact-Checking of Human and {AI} Peer Reviews},
+  author = {Song, Dingjie and Yan, Zhiling and Zhang, Ziqian and Zhang, Yuxuan and Sun, Lichao},
+  year   = {2026},
+  note   = {Preprint},
+  url    = {https://www.alphaxiv.org/abs/2610.premisecheck-peer-review-fact-checking}
 }
 ```
 
